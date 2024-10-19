@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OOP Practice Questions</title>
+    <link rel="stylesheet" href="../global.css" />
+    <link rel="stylesheet" href="questions.css" />
+</head>
+<body>
+    <div class="flashcard">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">
+                <h2 id="question"></h2>
+                <div class="options" id="options"></div>
+                <div class="button-container">
+                    <button class="show-hide" onclick="flipCard()">Show/Hide</button>
+                </div>
+            </div>
+            <div class="flashcard-back">
+                <h2>Answer:</h2>
+                <p id="answer"></p>
+                <p id="selected-answer"></p>
+                <div class="button-container">
+                    <button class="show-hide" onclick="flipCard()">Show/Hide</button>
+                </div>
+            </div>
+        </div>
+        <div class="note-section" id="note-section" style="display: none;">
+            <textarea id="note-input" placeholder="Add a note..."></textarea>
+            <button class="save-note" onclick="saveNote()">Save Note</button>
+        </div>
+        <button class="next-button" onclick="nextQuestion()">Next Question</button>
+    </div>
+
+    <script>
+        const flashcardsData = [
+        {
+            question: "What is the primary concept of OOP?",
+            options: ["Procedural Programming", "Modularity", "Object-Oriented Design", "Structured Programming"],
+            answer: "Object-Oriented Design"
+        },
+        {
+            question: "Which of the following is not a feature of OOP?",
+            options: ["Encapsulation", "Abstraction", "Inheritance", "Division"],
+            answer: "Division"
+        },
+        {
+            question: "In OOP, what binds the code and the data it manipulates together?",
+            options: ["Function", "Object", "Class", "Variable"],
+            answer: "Object"
+        },
+        {
+            question: "Which feature of OOP helps to hide the internal details of objects?",
+            options: ["Polymorphism", "Abstraction", "Encapsulation", "Inheritance"],
+            answer: "Encapsulation"
+        },
+        {
+            question: "What is the term used for creating a new class from an existing class in OOP?",
+            options: ["Composition", "Inheritance", "Abstraction", "Encapsulation"],
+            answer: "Inheritance"
+        },
+        {
+            question: "What does 'polymorphism' mean in the context of OOP?",
+            options: ["Single action in different forms", "Objects with same behavior", "Multiple classes with one behavior", "Function overloading only"],
+            answer: "Single action in different forms"
+        },
+        {
+            question: "Which of the following allows you to define methods with the same name but different signatures in the same class?",
+            options: ["Encapsulation", "Function Overloading", "Inheritance", "Function Overriding"],
+            answer: "Function Overloading"
+        },
+        {
+            question: "Which OOP concept is applied when a derived class provides a specific implementation for a method that is already defined in its base class?",
+            options: ["Overloading", "Overriding", "Encapsulation", "Inheritance"],
+            answer: "Overriding"
+        },
+        {
+            question: "Which of the following best describes an abstract class?",
+            options: ["A class that cannot be instantiated", "A class with no methods", "A class with only static methods", "A class that must have all methods implemented"],
+            answer: "A class that cannot be instantiated"
+        },
+        {
+            question: "What is the key difference between a class and an object?",
+            options: ["Class is an instance of an object", "Object is a blueprint of a class", "Class is a blueprint; object is an instance", "Object contains only methods, while class contains data"],
+            answer: "Class is a blueprint; object is an instance"
+        },
+        {
+            question: "Which of the following refers to multiple forms of a method in the same or different class?",
+            options: ["Method Overloading", "Method Overriding", "Polymorphism", "Inheritance"],
+            answer: "Polymorphism"
+        },
+        {
+            question: "What is the main purpose of an interface in OOP?",
+            options: ["To provide multiple inheritance", "To allow method overloading", "To ensure certain methods are implemented by a class", "To hide the implementation of methods"],
+            answer: "To ensure certain methods are implemented by a class"
+        },
+        {
+            question: "Which of the following cannot be used to achieve polymorphism in C++?",
+            options: ["Function overloading", "Operator overloading", "Templates", "Virtual functions"],
+            answer: "Templates"
+        },
+        {
+            question: "Which feature of OOP indicates code reusability?",
+            options: ["Polymorphism", "Encapsulation", "Inheritance", "Abstraction"],
+            answer: "Inheritance"
+        },
+        {
+            question: "Which of the following is NOT a type of inheritance?",
+            options: ["Multiple", "Multilevel", "Single", "Recursive"],
+            answer: "Recursive"
+        },
+        {
+            question: "What is meant by 'composition' in OOP?",
+            options: ["A class contains other classes as members", "A class inherits from multiple classes", "Two classes share the same properties", "A class modifies inherited properties"],
+            answer: "A class contains other classes as members"
+        },
+        {
+            question: "Which of these access specifiers is used to restrict access only within the same class?",
+            options: ["Public", "Private", "Protected", "Internal"],
+            answer: "Private"
+        },
+        {
+            question: "In which of the following cases would you use a virtual function in C++?",
+            options: ["To define a static method", "To achieve late binding for polymorphism", "To allow multiple inheritance", "To create a constant method"],
+            answer: "To achieve late binding for polymorphism"
+        },
+        {
+            question: "Which of the following statements about destructors is true?",
+            options: ["Destructors can take arguments", "Destructors are overloaded", "A class can have more than one destructor", "Destructors are called when an object goes out of scope"],
+            answer: "Destructors are called when an object goes out of scope"
+        },
+        {
+            question: "Which of the following best describes polymorphism in OOP?",
+            options: ["Polymorphism allows objects of different types to be treated as objects of a common supertype.", 
+                        "Polymorphism enables the same function name to be used for different types.", 
+                        "Polymorphism occurs when two classes have the same properties and methods.", 
+                        "Polymorphism allows functions to return different data types."],
+            answer: "Polymorphism allows objects of different types to be treated as objects of a common supertype."
+        }
+        
+        ];
+
+        let currentQuestionIndex = 0;
+        let selectedAnswer = '';
+        let note = '';
+
+        function initializeFlashcard() {
+            const currentQuestion = flashcardsData[currentQuestionIndex];
+            document.getElementById('question').textContent = currentQuestion.question;
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = ''; // Clear previous options
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.onclick = () => selectAnswer(option);
+                optionsContainer.appendChild(button);
+            });
+            document.getElementById('answer').textContent = currentQuestion.answer;
+            document.getElementById('selected-answer').textContent = '';
+            document.getElementById('note-input').value = '';
+        }
+
+        function selectAnswer(option) {
+            selectedAnswer = option;
+            flipCard();
+            updateSelectedAnswer();
+        }
+
+        function updateSelectedAnswer() {
+            const selectedAnswerElement = document.getElementById('selected-answer');
+            if (selectedAnswer) {
+                const isCorrect = selectedAnswer === flashcardsData[currentQuestionIndex].answer;
+                selectedAnswerElement.textContent = `You selected: ${selectedAnswer}`;
+                selectedAnswerElement.style.color = isCorrect ? 'green' : 'red';
+            } else {
+                selectedAnswerElement.textContent = '';
+            }
+        }
+
+        function flipCard() {
+            document.querySelector('.flashcard').classList.toggle('flipped');
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex = (currentQuestionIndex + 1) % flashcardsData.length;
+            selectedAnswer = '';
+            note = '';
+            document.querySelector('.flashcard').classList.remove('flipped');
+            initializeFlashcard();
+        }
+
+        initializeFlashcard();
+    </script>
+</body>
+</html>

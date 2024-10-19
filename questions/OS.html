@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OS Practice Questions</title>
+    <link rel="stylesheet" href="../global.css" />
+    <link rel="stylesheet" href="questions.css" />
+</head>
+<body>
+    <div class="flashcard">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">
+                <h2 id="question"></h2>
+                <div class="options" id="options"></div>
+                <div class="button-container">
+                    <button class="show-hide" onclick="flipCard()">Show/Hide</button>
+                </div>
+            </div>
+            <div class="flashcard-back">
+                <h2>Answer:</h2>
+                <p id="answer"></p>
+                <p id="selected-answer"></p>
+                <div class="button-container">
+                    <button class="show-hide" onclick="flipCard()">Show/Hide</button>
+                </div>
+            </div>
+        </div>
+        <div class="note-section" id="note-section" style="display: none;">
+            <textarea id="note-input" placeholder="Add a note..."></textarea>
+            <button class="save-note" onclick="saveNote()">Save Note</button>
+        </div>
+        <button class="next-button" onclick="nextQuestion()">Next Question</button>
+    </div>
+
+    <script>
+        const flashcardsData = [
+            {
+                question: "What is the primary purpose of an operating system?",
+                options: ["Manage hardware resources", "Provide a user interface", "Execute user applications", "All of the above"],
+                answer: "All of the above"
+            },
+            {
+                question: "Which of the following is NOT an operating system?",
+                options: ["Windows", "Linux", "Python", "macOS"],
+                answer: "Python"
+            },
+            {
+                question: "In which of the following states is a process waiting for an event to occur?",
+                options: ["Running", "Blocked", "Ready", "New"],
+                answer: "Blocked"
+            },
+            {
+                question: "What is the function of the kernel in an operating system?",
+                options: ["To provide user interfaces", "To manage system resources", "To execute applications", "To display graphics"],
+                answer: "To manage system resources"
+            },
+            {
+                question: "Which of the following is a type of scheduler in an operating system?",
+                options: ["Long-term scheduler", "Medium-term scheduler", "Short-term scheduler", "All of the above"],
+                answer: "All of the above"
+            },
+            {
+                question: "What is the maximum size of a process that can be loaded into memory if the page size is 4KB and the total memory size is 1GB?",
+                options: ["256MB", "512MB", "1GB", "4GB"],
+                answer: "1GB"
+            },
+            {
+                question: "Which of the following is a method for inter-process communication (IPC)?",
+                options: ["Shared memory", "Message passing", "Semaphores", "All of the above"],
+                answer: "All of the above"
+            },
+            {
+                question: "In which scheduling algorithm does the CPU execute the process that has been in the ready queue the longest?",
+                options: ["Shortest Job First (SJF)", "First-Come, First-Served (FCFS)", "Round Robin", "Priority Scheduling"],
+                answer: "First-Come, First-Served (FCFS)"
+            },
+            {
+                question: "In which of the following states is a process waiting for an event to occur?",
+                options: ["Running", "Blocked", "Ready", " New"],
+                answer: "Blocked"
+            },
+            {
+                question: "What is the purpose of a process control block (PCB)?",
+                options: ["To hold the process's data", "To manage the CPU", "To store the process state and context", "To execute instructions"],
+                answer: "To store the process state and context"
+            },
+            {
+                question: "Which type of memory allocation strategy can lead to external fragmentation?",
+                options: ["Contiguous allocation", "Paging", "Segmentation", "Both A and C"],
+                answer: "Both A and C"
+            },
+            {
+                question: "What is the main advantage of using a microkernel architecture?",
+                options: ["Simplified design", "Higher performance", "Better security and stability", "Lower memory usage"],
+                answer: "Better security and stability"
+            },
+            {
+                question: "In the context of virtual memory, what does a page fault indicate?",
+                options: ["The page is in memory", "The page is not in memory", "The page is being accessed", "The page is corrupted"],
+                answer: "The page is not in memory"
+            },
+            {
+                question: "Which synchronization mechanism allows multiple processes to access a shared resource without conflicts?",
+                options: ["Mutex", "Semaphore", "Monitor", "All of the above"],
+                answer: "All of the above"
+            },
+            {
+                question: "What is the purpose of a disk scheduler?",
+                options: ["To manage memory allocation", "To optimize read/write operations on disk", "To handle input/output operations", "To schedule CPU tasks"],
+                answer: "To optimize read/write operations on disk"
+            },
+            {
+                question: "What is the key difference between a process and a thread?",
+                options: ["Threads have their own memory space", "Processes share memory with other processes", "Threads are heavier than processes", "Processes can run independently while threads cannot"],
+                answer: "Processes share memory with other processes"
+            },
+            {
+                question: "Which of the following is a characteristic of a real-time operating system?",
+                options: ["High throughput", "Predictable response times", "Multitasking", "User-friendliness"],
+                answer: "Predictable response times"
+            },
+            {
+                question: "What is thrashing in the context of virtual memory?",
+                options: ["Excessive disk I/O due to page faults", "High CPU utilization", "Inefficient scheduling", "Memory leaks"],
+                answer: "Excessive disk I/O due to page faults"
+            },
+            {
+                question: "What is the primary function of the bootloader in an operating system?",
+                options: ["To initialize hardware components", "To load the operating system into memory", "To manage user sessions", "To handle interrupts"],
+                answer: "To load the operating system into memory"
+            },
+            {
+                question: "In a distributed system, what is the main challenge associated with consistency?",
+                options: ["Network latency", "Data replication", "Fault tolerance", "All of the above"],
+                answer: "All of the above"
+            },
+            {
+                question: "Which of the following is NOT a reason for using multithreading in applications?",
+                options: ["Improved performance", "Resource sharing", "Simplified programming model", "Increased memory consumption"],
+                answer: "Increased memory consumption"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let selectedAnswer = '';
+        let note = '';
+
+        function initializeFlashcard() {
+            const currentQuestion = flashcardsData[currentQuestionIndex];
+            document.getElementById('question').textContent = currentQuestion.question;
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = ''; // Clear previous options
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.onclick = () => selectAnswer(option);
+                optionsContainer.appendChild(button);
+            });
+            document.getElementById('answer').textContent = currentQuestion.answer;
+            document.getElementById('selected-answer').textContent = '';
+            document.getElementById('note-input').value = '';
+        }
+
+        function selectAnswer(option) {
+            selectedAnswer = option;
+            flipCard();
+            updateSelectedAnswer();
+        }
+
+        function updateSelectedAnswer() {
+            const selectedAnswerElement = document.getElementById('selected-answer');
+            if (selectedAnswer) {
+                const isCorrect = selectedAnswer === flashcardsData[currentQuestionIndex].answer;
+                selectedAnswerElement.textContent = `You selected: ${selectedAnswer}`;
+                selectedAnswerElement.style.color = isCorrect ? 'green' : 'red';
+            } else {
+                selectedAnswerElement.textContent = '';
+            }
+        }
+
+        function flipCard() {
+            document.querySelector('.flashcard').classList.toggle('flipped');
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex = (currentQuestionIndex + 1) % flashcardsData.length;
+            selectedAnswer = '';
+            note = '';
+            document.querySelector('.flashcard').classList.remove('flipped');
+            initializeFlashcard();
+        }
+
+        initializeFlashcard();
+    </script>
+</body>
+</html>

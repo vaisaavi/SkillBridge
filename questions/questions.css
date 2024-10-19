@@ -1,0 +1,112 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--primary);
+    margin: 10px;
+}
+.flashcard {
+    width: 65%;
+    height: 400px;
+    perspective: 1000px;
+}
+#question
+{
+    margin-bottom: 0px;
+}
+.flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+.flashcard.flipped .flashcard-inner {
+    transform: rotateY(180deg);
+}
+.flashcard-front, .flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: var(--background);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.flashcard-back {
+    transform: rotateY(180deg);
+}
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+button {
+    padding: 10px;
+    border: none;
+    background-color: var(--background-50);
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    text-align: left;
+    padding: 10px 20px;
+    margin: 0px 45px;
+    width: 80%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+button:hover {
+    background-color: var(--background-100);
+}
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    justify-content: center
+}
+.show-hide {
+    background-color: var(--primary);
+    color: var(--text-50);
+    width: 118px;
+    text-align: center;
+    font-style: 900;
+}
+.show-hide:hover {
+    background-color: var(--secondary);
+    color: var(--text-950)
+}
+textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    resize: vertical;
+}
+.save-note {
+    margin-top: 10px;
+    background-color: #008CBA;
+    color: white;
+}
+.save-note:hover {
+    background-color: #007B9A;
+}
+.next-button {
+    background-color: var(--secondary);
+    color: var(--text-950);
+    margin-top: 10px;
+    width: 140px;
+    text-align: center;
+    left: 80%;
+    position: absolute;
+}
+.next-button:hover {
+    background-color: var(--secondary-200);
+}

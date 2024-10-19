@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Practice Questions</title>
+    <link rel="stylesheet" href="questions.css" />
+    <link rel="stylesheet" href="../global.css" />
+</head>
+<body>
+    <div class="flashcard">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">
+                <h2 id="question"></h2>
+                <div class="options" id="options"></div>
+                <div class="button-container">
+                    <button class="show-hide" onclick="flipCard()">Show/Hide</button>
+                </div>
+            </div>
+            <div class="flashcard-back">
+                <h2>Answer:</h2>
+                <p id="answer"></p>
+                <p id="selected-answer"></p>
+                <div class="button-container">
+                    <button class="show-hide" onclick="flipCard()">Show/Hide</button>
+                </div>
+            </div>
+        </div>
+        <div class="note-section" id="note-section" style="display: none;">
+            <textarea id="note-input" placeholder="Add a note..."></textarea>
+            <button class="save-note" onclick="saveNote()">Save Note</button>
+        </div>
+        <button class="next-button" onclick="nextQuestion()">Next Question</button>
+    </div>
+
+    <script>
+        const flashcardsData = [
+    {
+        question: "Which data structure uses LIFO (Last In First Out) principle?",
+        options: ["Queue", "Stack", "Linked List", "Tree"],
+        answer: "Stack"
+    },
+    {
+        question: "What is the time complexity of searching an element in a balanced binary search tree (BST)?",
+        options: ["O(n)", "O(log n)", "O(1)", "O(n log n)"],
+        answer: "O(log n)"
+    },
+    {
+        question: "Which of the following is the correct postfix expression for the infix expression 'A + B * C'?",
+        options: ["ABC*+", "AB+C*", "A+BC*", "AB+C*+"],
+        answer: "ABC*+"
+    },
+    {
+        question: "Which sorting algorithm has the worst-case time complexity of O(n^2)?",
+        options: ["Merge Sort", "Quick Sort", "Bubble Sort", "Heap Sort"],
+        answer: "Bubble Sort"
+    },
+    {
+        question: "What is a min-heap?",
+        options: ["A tree where each parent node is smaller than its child nodes", "A tree where each parent node is larger than its child nodes", "A binary search tree", "A type of linked list"],
+        answer: "A tree where each parent node is smaller than its child nodes"
+    },
+    {
+        question: "Which data structure is most efficient for implementing a priority queue?",
+        options: ["Stack", "Queue", "Heap", "Array"],
+        answer: "Heap"
+    },
+    {
+        question: "Which traversal algorithm visits nodes in the order: root, left subtree, right subtree?",
+        options: ["In-order traversal", "Post-order traversal", "Pre-order traversal", "Level-order traversal"],
+        answer: "Pre-order traversal"
+    },
+    {
+        question: "What is the time complexity of inserting an element at the beginning of a linked list?",
+        options: ["O(1)", "O(n)", "O(log n)", "O(n^2)"],
+        answer: "O(1)"
+    },
+    {
+        question: "Which of the following data structures is most appropriate for implementing a recursive function?",
+        options: ["Queue", "Array", "Stack", "Tree"],
+        answer: "Stack"
+    },
+    {
+        question: "Which graph traversal algorithm uses a queue data structure?",
+        options: ["Depth-First Search", "Breadth-First Search", "Dijkstra's Algorithm", "Prim's Algorithm"],
+        answer: "Breadth-First Search"
+    },
+    {
+        question: "Which of the following operations has the best time complexity in a hash table?",
+        options: ["Insertion", "Searching", "Deletion", "All of the above"],
+        answer: "All of the above"
+    },
+    {
+        question: "What is the height of a balanced binary tree with 'n' nodes?",
+        options: ["O(log n)", "O(n)", "O(1)", "O(n log n)"],
+        answer: "O(log n)"
+    },
+    {
+        question: "Which sorting algorithm is stable and uses divide-and-conquer?",
+        options: ["Quick Sort", "Merge Sort", "Heap Sort", "Selection Sort"],
+        answer: "Merge Sort"
+    },
+    {
+        question: "In a circular linked list, the end node points to:",
+        options: ["Head node", "Tail node", "Null", "Random node"],
+        answer: "Head node"
+    },
+    {
+        question: "Which data structure is used to efficiently solve the problem of balancing parentheses?",
+        options: ["Queue", "Stack", "Heap", "Tree"],
+        answer: "Stack"
+    },
+    {
+        question: "Which of the following is an advantage of a doubly linked list over a singly linked list?",
+        options: ["Simpler structure", "Requires less memory", "Can be traversed in both directions", "Faster insertion and deletion at the head"],
+        answer: "Can be traversed in both directions"
+    },
+    {
+        question: "What is the worst-case time complexity of Quick Sort?",
+        options: ["O(n)", "O(n log n)", "O(n^2)", "O(log n)"],
+        answer: "O(n^2)"
+    },
+    {
+        question: "Which algorithm is used to find the shortest path in a weighted graph?",
+        options: ["Depth-First Search", "Breadth-First Search", "Kruskal's Algorithm", "Dijkstra's Algorithm"],
+        answer: "Dijkstra's Algorithm"
+    },
+    {
+        question: "In a Binary Search Tree (BST), which of the following is true?",
+        options: ["The left subtree of a node contains only nodes with keys less than the node's key", "The right subtree of a node contains only nodes with keys greater than the node's key", "Both a and b", "None of the above"],
+        answer: "Both a and b"
+    },
+    {
+        question: "Which data structure can be used to implement a LRU (Least Recently Used) cache efficiently?",
+        options: ["Queue and HashMap", "Stack and LinkedList", "Heap and Array", "Doubly LinkedList and HashMap"],
+        answer: "Doubly LinkedList and HashMap"
+    }   
+        ];
+
+        let currentQuestionIndex = 0;
+        let selectedAnswer = '';
+        let note = '';
+
+        function initializeFlashcard() {
+            const currentQuestion = flashcardsData[currentQuestionIndex];
+            document.getElementById('question').textContent = currentQuestion.question;
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = ''; // Clear previous options
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.onclick = () => selectAnswer(option);
+                optionsContainer.appendChild(button);
+            });
+            document.getElementById('answer').textContent = currentQuestion.answer;
+            document.getElementById('selected-answer').textContent = '';
+            document.getElementById('note-input').value = '';
+        }
+
+        function selectAnswer(option) {
+            selectedAnswer = option;
+            flipCard();
+            updateSelectedAnswer();
+        }
+
+        function updateSelectedAnswer() {
+            const selectedAnswerElement = document.getElementById('selected-answer');
+            if (selectedAnswer) {
+                const isCorrect = selectedAnswer === flashcardsData[currentQuestionIndex].answer;
+                selectedAnswerElement.textContent = `You selected: ${selectedAnswer}`;
+                selectedAnswerElement.style.color = isCorrect ? 'green' : 'red';
+            } else {
+                selectedAnswerElement.textContent = '';
+            }
+        }
+
+        function flipCard() {
+            document.querySelector('.flashcard').classList.toggle('flipped');
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex = (currentQuestionIndex + 1) % flashcardsData.length;
+            selectedAnswer = '';
+            note = '';
+            document.querySelector('.flashcard').classList.remove('flipped');
+            initializeFlashcard();
+        }
+
+        initializeFlashcard();
+    </script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Technology Practice Questions</title>
+    <link rel="stylesheet" href="../global.css" />
+    <link rel="stylesheet" href="questions.css" />
+</head>
+<body>
+    <div class="flashcard">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">
+                <h2 id="question"></h2>
+                <div class="options" id="options"></div>
+                <div class="button-container">
+                    <button class="show-hide" onclick="flipCard()">Show/Hide</button>
+                </div>
+            </div>
+            <div class="flashcard-back">
+                <h2>Answer:</h2>
+                <p id="answer"></p>
+                <p id="selected-answer"></p>
+                <div class="button-container">
+                    <button class="show-hide" onclick="flipCard()">Show/Hide</button>
+                </div>
+            </div>
+        </div>
+        <div class="note-section" id="note-section" style="display: none;">
+            <textarea id="note-input" placeholder="Add a note..."></textarea>
+            <button class="save-note" onclick="saveNote()">Save Note</button>
+        </div>
+        <button class="next-button" onclick="nextQuestion()">Next Question</button>
+    </div>
+
+    <script>
+        const flashcardsData = [
+        {
+            question: "Which of the following is used to create a website's structure?",
+            options: ["CSS", "JavaScript", "HTML", "PHP"],
+            answer: "HTML"
+        },
+        {
+            question: "What does CSS stand for?",
+            options: ["Cascading Style Sheets", "Computer Style Sheets", "Creative Style Sheets", "Cascading Sheet Styles"],
+            answer: "Cascading Style Sheets"
+        },
+        {
+            question: "Which HTML tag is used to define an internal style sheet?",
+            options: ["<style>", "<css>", "<script>", "<link>"],
+            answer: "<style>"
+        },
+        {
+            question: "In JavaScript, what keyword is used to declare a variable?",
+            options: ["var", "let", "const", "All of the above"],
+            answer: "All of the above"
+        },
+        {
+            question: "Which of the following HTTP methods is used to retrieve data from a server?",
+            options: ["POST", "PUT", "GET", "DELETE"],
+            answer: "GET"
+        },
+        {
+            question: "Which tag is used to define a hyperlink in HTML?",
+            options: ["<a>", "<link>", "<href>", "<nav>"],
+            answer: "<a>"
+        },
+        {
+            question: "What is the purpose of the 'alt' attribute in an HTML image tag?",
+            options: ["To display the image", "To provide a hyperlink for the image", "To specify an alternate text for the image", "To align the image"],
+            answer: "To specify an alternate text for the image"
+        },
+        {
+            question: "Which of the following is a JavaScript framework?",
+            options: ["React", "Laravel", "Django", "Flask"],
+            answer: "React"
+        },
+        {
+            question: "Which property is used to change the background color in CSS?",
+            options: ["color", "background-color", "bg-color", "background"],
+            answer: "background-color"
+        },
+        {
+            question: "What is the correct syntax for referring to an external JavaScript file?",
+            options: ["<script href='xxx.js'>", "<script src='xxx.js'>", "<script name='xxx.js'>", "<script link='xxx.js'>"],
+            answer: "<script src='xxx.js'>"
+        },
+        {
+            question: "Which of the following is a valid JavaScript data type?",
+            options: ["number", "string", "boolean", "All of the above"],
+            answer: "All of the above"
+        },
+        {
+            question: "What does DOM stand for in web development?",
+            options: ["Document Object Model", "Data Object Method", "Document Oriented Model", "Data Oriented Method"],
+            answer: "Document Object Model"
+        },
+        {
+            question: "Which of the following is used to make a form send its data to a web server?",
+            options: ["action", "method", "submit", "Both action and method"],
+            answer: "Both action and method"
+        },
+        {
+            question: "Which CSS property controls the text size?",
+            options: ["text-size", "font-style", "font-size", "text-style"],
+            answer: "font-size"
+        },
+        {
+            question: "Which of the following is true about cookies in web development?",
+            options: ["Cookies store data on the server side", "Cookies store data on the client side", "Cookies cannot store user preferences", "Cookies can store sensitive data securely"],
+            answer: "Cookies store data on the client side"
+        },
+        {
+            question: "Which protocol is used to secure communication over the internet?",
+            options: ["HTTP", "SSL", "HTTPS", "FTP"],
+            answer: "HTTPS"
+        },
+        {
+            question: "What does AJAX stand for?",
+            options: ["Asynchronous JavaScript and XML", "Advanced JavaScript and XHTML", "Application JavaScript and XML", "Asynchronous JavaScript and XHTML"],
+            answer: "Asynchronous JavaScript and XML"
+        },
+        {
+            question: "What is the correct syntax for adding a comment in CSS?",
+            options: ["// comment", "/* comment */", "<!-- comment -->", "' comment"],
+            answer: "/* comment */"
+        },
+        {
+            question: "Which HTML element is used to define a client-side script?",
+            options: ["<script>", "<style>", "<link>", "<code>"],
+            answer: "<script>"
+        },
+        {
+            question: "What is the correct way to include an external CSS file in an HTML document?",
+            options: ["<stylesheet>style.css</stylesheet>", "<link rel='stylesheet' href='style.css'>", "<style src='style.css'>", "<link src='style.css'>"],
+            answer: "<link rel='stylesheet' href='style.css'>"
+        }
+        ];
+
+        let currentQuestionIndex = 0;
+        let selectedAnswer = '';
+        let note = '';
+
+        function initializeFlashcard() {
+            const currentQuestion = flashcardsData[currentQuestionIndex];
+            document.getElementById('question').textContent = currentQuestion.question;
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = ''; // Clear previous options
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.onclick = () => selectAnswer(option);
+                optionsContainer.appendChild(button);
+            });
+            document.getElementById('answer').textContent = currentQuestion.answer;
+            document.getElementById('selected-answer').textContent = '';
+            document.getElementById('note-input').value = '';
+        }
+
+        function selectAnswer(option) {
+            selectedAnswer = option;
+            flipCard();
+            updateSelectedAnswer();
+        }
+
+        function updateSelectedAnswer() {
+            const selectedAnswerElement = document.getElementById('selected-answer');
+            if (selectedAnswer) {
+                const isCorrect = selectedAnswer === flashcardsData[currentQuestionIndex].answer;
+                selectedAnswerElement.textContent = `You selected: ${selectedAnswer}`;
+                selectedAnswerElement.style.color = isCorrect ? 'green' : 'red';
+            } else {
+                selectedAnswerElement.textContent = '';
+            }
+        }
+
+        function flipCard() {
+            document.querySelector('.flashcard').classList.toggle('flipped');
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex = (currentQuestionIndex + 1) % flashcardsData.length;
+            selectedAnswer = '';
+            note = '';
+            document.querySelector('.flashcard').classList.remove('flipped');
+            initializeFlashcard();
+        }
+
+        initializeFlashcard();
+    </script>
+</body>
+</html>
