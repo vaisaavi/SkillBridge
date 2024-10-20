@@ -1,0 +1,15 @@
+{
+    "name": "devanshgoyal/skill-bridge-main",
+    "autoload": {
+        "psr-4": {
+            "Devanshgoyal\\SkillBridgeMain\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "devansh-g1",
+            "email": "devanshgoyal1234@gmail.com"
+        }
+    ],
+    "require": {}
+}
